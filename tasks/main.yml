@@ -1,0 +1,53 @@
+---
+- name: Install some dependencies
+  package:
+    name: "{{ item }}"
+    state: present
+  with_items: "{{ docker_dependencies }}"
+
+- name: Install Docker Module for Python
+  pip:
+    name: docker
+
+- name: create mqtt directories
+  file:
+    path: "{{ item }}"
+    state: directory
+  #with_items: "{{ mqtt_folders }}"
+  with_items:
+    - "{{ docker_folder }}/{{ mqtt_base_folder }}"
+    - "{{ docker_folder }}/{{ mqtt_conf_folder }}"
+    - "{{ docker_folder }}/{{ mqtt_confd_folder }}"
+    - "{{ docker_folder }}/{{ mqtt_data_folder }}"
+    - "{{ docker_folder }}/{{ mqtt_log_folder }}"
+
+- name: copy mqtt config file
+  template:
+    src: mosquitto.conf.j2
+    dest: "{{ docker_folder }}/{{ mqtt_conf_folder }}/mosquitto.conf"
+
+- name: copy mqtt websockets config file
+  template:
+    src: websockets.conf.j2
+    dest: "{{ docker_folder }}/{{ mqtt_confd_folder }}/websockets.conf"
+
+- name: create mqtt container
+  docker_container:
+    name: "{{ mqtt_container_name }}"
+    image: "{{ mqtt_image }}"
+    state: "{{ mqtt_container_state }}"
+    pull: "{{ mqtt_pull }}"
+    restart_policy: "{{ mqtt_restart }}"
+    network_mode: "{{ mqtt_network }}"
+    #env:
+    #  ...
+    ports:
+      - "{{ mqtt_default_listener_port | string }}:{{ mqtt_default_listener_port | string }}"
+      - "{{ mqtt_websocket_listener_port | string }}:{{ mqtt_default_listener_port | string }}"
+    exposed:
+      - "{{ mqtt_default_listener_port  | string }}"
+      - "{{ mqtt_websocket_listener_port  | string }}"
+    volumes:
+      - "{{ docker_folder }}/{{ mqtt_conf_folder }}/:/mqtt/config/"
+      - "{{ docker_folder }}/{{ mqtt_data_folder }}/:/mqtt/data/"
+      - "{{ docker_folder }}/{{ mqtt_log_folder }}/:/mqtt/log/"

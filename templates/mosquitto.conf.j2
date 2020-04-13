@@ -1,0 +1,15 @@
+# {{ansible_managed}}
+
+pid_file {{ mqtt_pid_file }}
+
+persistence {{ mqtt_persistence }}
+persistence_location {{ mqtt_persistence_location }}
+
+user {{ mqtt_user }}
+
+port {{ mqtt_default_listener_port }}
+
+log_dest file {{ mqtt_log_dest_file }}
+log_dest {{ mqtt_log_dest }}
+
+include_dir {{ mqtt_include_dir }}

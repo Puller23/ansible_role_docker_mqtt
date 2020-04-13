@@ -1,0 +1,50 @@
+---
+#mqtt_folders:
+#    - "{{ docker_folder }}/mqtt"
+#    - "{{ docker_folder }}/mqtt/config/conf.d"
+#    - "{{ docker_folder }}/mqtt/data"
+#    - "{{ docker_folder }}/mqtt/log"
+mqtt_base_folder: "mqtt"
+mqtt_conf_folder: "mqtt/config"
+mqtt_confd_folder: "mqtt/config/conf.d"
+mqtt_data_folder: "mqtt/data"
+mqtt_log_folder: "mqtt/log"
+
+mqtt_websocket_listener_port: 9009
+mqtt_protocol: websockets
+
+# mosquitto.conf
+mqtt_pid_file: /var/run/mosquitto.pid
+
+mqtt_persistence: "true"
+mqtt_persistence_location: /mqtt/data/
+
+mqtt_user: root
+mqtt_default_listener_port: 1883
+
+mqtt_log_dest_file: /mqtt/log/mosquitto.log
+mqtt_log_dest: stdout
+
+mqtt_include_dir: /mqtt/config/conf.d
+
+# docker
+docker_dependencies:
+      - python3-pip
+
+# docker config
+mqtt_container_name: mqtt
+mqtt_container_state: started
+mqtt_restart: always
+mqtt_pull: true
+mqtt_expose_ports:
+      - "1883"
+      - "9009"
+mqtt_ports:
+      - "1883:1883"
+      - "9009:9009"
+mqtt_image: toke/mosquitto
+mqtt_network: bridge
+#mqtt_volumes:
+#      - ./{{ mqtt_conf_folder }}/:/mqtt/config/
+#      - ./{{ mqtt_log_folder }}/:/mqtt/log/
+#      - ./{{ mqtt_data_folder }}/:/mqtt/data/
